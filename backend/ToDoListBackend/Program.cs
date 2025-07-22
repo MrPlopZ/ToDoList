@@ -11,12 +11,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     )
 );
 
-// Servicios del contenedor
-builder.Services.AddOpenApi();
-
-var app = builder.Build();
-
-// Cors
+// Añadir CORS antes de Build
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularDevClient",
@@ -25,13 +20,29 @@ builder.Services.AddCors(options =>
                         .AllowAnyMethod());
 });
 
+// Registrar controladores
+builder.Services.AddControllers();
 
-// Configurar HTTP request pipeline
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+// Agregar Swagger/OpenAPI
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+var app = builder.Build();
+
+// Middleware pipeline
+app.UseRouting();
+
+app.UseCors("AllowAngularDevClient");
 
 app.UseHttpsRedirection();
-app.UseCors("AllowAngularDevClient");
+
+if (app.Environment.IsDevelopment())
+{
+    // Habilitar middleware para Swagger
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.MapControllers();
+
 app.Run();

@@ -9,6 +9,6 @@ namespace ToDoListBackend.Data
         {
         }
 
-        public DbSet<ToDoTask> Tasks { get; set; }
+        public DbSet<ToDoTask> ToDoTasks { get; set; }
     }
 }
