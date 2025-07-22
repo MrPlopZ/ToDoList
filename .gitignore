@@ -1,1 +1,19 @@
-.vs/ 
+# Ignorar bin y obj en backend
+/backend/ToDoListBackend/bin/
+/backend/ToDoListBackend/obj/
+
+# Ignorar node_modules y carpetas de build en frontend
+/frontend/todolistfrontend/node_modules/
+/frontend/todolistfrontend/dist/
+/frontend/todolistfrontend/out-tsc/
+
+# Ignorar configuraciones de IDE
+.vs/
+.vscode/
+
+# Archivos temporales y logs
+*.user
+*.suo
+*.log
+*.cache
+*.pdb
