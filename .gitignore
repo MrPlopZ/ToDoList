@@ -1,6 +1,6 @@
 # Ignorar bin y obj en backend
-/backend/ToDoListBackend/bin/
-/backend/ToDoListBackend/obj/
+bin/
+obj/
 
 # Ignorar node_modules y carpetas de build en frontend
 /frontend/todolistfrontend/node_modules/
