@@ -20,21 +20,29 @@ namespace ToDoListBackend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ToDoTask>>> GetTasks()
         {
-            return await _context.ToDoTasks.ToListAsync();
+            return await _context.ToDoTasks
+                .Include(t => t.Category)
+                .ToListAsync();
         }
 
         // POST: api/ToDoTasks
         [HttpPost]
         public async Task<ActionResult<ToDoTask>> PostToDoTask(ToDoTask toDoTask)
         {
-            toDoTask.Id = 0; // Forzar que el ID sea generado por la DB
+            toDoTask.Id = 0;
+
+            if (!_context.Categories.Any(c => c.Id == toDoTask.CategoryId))
+            {
+                return BadRequest("La categoría especificada no existe.");
+            }
+
             _context.ToDoTasks.Add(toDoTask);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetTasks), new { id = toDoTask.Id }, toDoTask);
         }
 
-        // PUT: api/ToDoTasks/5
+        // PUT: api/ToDoTasks
         [HttpPut("{id}")]
         public async Task<IActionResult> PutToDoTask(int id, ToDoTask updatedTask)
         {
@@ -44,18 +52,23 @@ namespace ToDoListBackend.Controllers
                 return NotFound();
             }
 
-            // Campos editables
+            if (!_context.Categories.Any(c => c.Id == updatedTask.CategoryId))
+            {
+                return BadRequest("La categoría especificada no existe.");
+            }
+
             existingTask.Title = updatedTask.Title;
             existingTask.Description = updatedTask.Description;
             existingTask.IsCompleted = updatedTask.IsCompleted;
             existingTask.DueDate = updatedTask.DueDate;
+            existingTask.CategoryId = updatedTask.CategoryId;
 
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        // DELETE: api/ToDoTasks/5
+        // DELETE: api/ToDoTasks
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteToDoTask(int id)
         {
@@ -70,7 +83,5 @@ namespace ToDoListBackend.Controllers
 
             return NoContent();
         }
-
     }
-
 }
