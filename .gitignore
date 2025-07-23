@@ -17,3 +17,5 @@ obj/
 *.log
 *.cache
 *.pdb
+/backend/ToDoListBackend/obj/Debug/net9.0/ToDoListBackend.AssemblyInfo.cs
+/backend/ToDoListBackend/obj/Debug/net9.0/ToDoListBackend.AssemblyInfoInputs.cache
