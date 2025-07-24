@@ -1,14 +1,12 @@
-export interface Category {
-  id: number;
-  name: string;
-}
+import { Category } from './category.model';
 
 export interface ToDoTask {
   id: number;
   title: string;
-  description?: string;
+  description: string;
+  dueDate: Date;
   isCompleted: boolean;
-  dueDate?: Date;
   categoryId: number;
   category?: Category;
 }
+

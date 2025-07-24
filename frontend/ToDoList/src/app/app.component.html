@@ -1,9 +1,57 @@
+<h1>Lista de Tareas</h1>
+
+<form (submit)="addTask()" #taskForm="ngForm">
+  <input
+    type="text"
+    name="title"
+    [(ngModel)]="newTask.title"
+    placeholder="Título"
+    required
+  />
+
+  <input
+    type="text"
+    name="description"
+    [(ngModel)]="newTask.description"
+    placeholder="Descripción"
+  />
+
+  <input
+    type="date"
+    name="dueDate"
+    [(ngModel)]="newTask.dueDate"
+    placeholder="Fecha límite"
+    required
+  />
+
+  <label>
+    <input
+      type="checkbox"
+      name="isCompleted"
+      [(ngModel)]="newTask.isCompleted"
+    />
+    ¿Completada?
+  </label>
+
+  <select [(ngModel)]="newTask.categoryId" name="category">
+    <option *ngFor="let category of categories" [value]="category.id">
+      {{ category.name }}
+    </option>
+  </select>
+
+  <button type="submit">Añadir</button>
+</form>
+
+<hr />
+
 <h1>{{ title }}</h1>
 
 <ul>
   <li *ngFor="let task of tasks">
-    <strong>{{ task.title }}</strong> ({{ task.category?.name || 'Sin categoría' }})
+    <strong>{{ task.title }}</strong> ({{
+      task.category?.name || "Sin categoría"
+    }})
     <p>{{ task.description }}</p>
-    <p>Completado: {{ task.isCompleted ? 'Sí' : 'No' }}</p>
+    <p>Completado: {{ task.isCompleted ? "Sí" : "No" }}</p>
   </li>
 </ul>
