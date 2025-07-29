@@ -9,7 +9,9 @@ namespace ToDoListBackend.Data
         {
         }
 
-        public DbSet<ToDoTask> ToDoTasks { get; set; }
-        public DbSet<Category> Categories { get; set; }
+        public DbSet<ToDoTask> ToDoTasks { get; set; } = null!;
+        public DbSet<Category> Category { get; set; } = null!;
+        public DbSet<Project> Projects { get; set; } = null!;
+
     }
 }

@@ -20,14 +20,14 @@ namespace ToDoListBackend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
         {
-            return await _context.Categories.ToListAsync();
+            return await _context.Category.ToListAsync();
         }
 
         // GET: api/Categories/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Category>> GetCategory(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _context.Category.FindAsync(id);
 
             if (category == null)
             {
@@ -42,7 +42,7 @@ namespace ToDoListBackend.Controllers
         public async Task<ActionResult<Category>> PostCategory(Category category)
         {
             category.Id = 0; // Para forzar autogeneración
-            _context.Categories.Add(category);
+            _context.Category.Add(category);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetCategory), new { id = category.Id }, category);
@@ -52,7 +52,7 @@ namespace ToDoListBackend.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCategory(int id, Category updatedCategory)
         {
-            var existing = await _context.Categories.FindAsync(id);
+            var existing = await _context.Category.FindAsync(id);
             if (existing == null)
                 return NotFound();
 
@@ -66,7 +66,7 @@ namespace ToDoListBackend.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            var category = await _context.Category.FindAsync(id);
             if (category == null)
                 return NotFound();
 
@@ -75,7 +75,7 @@ namespace ToDoListBackend.Controllers
             if (hasTasks)
                 return BadRequest("No se puede eliminar la categoría porque tiene tareas asociadas.");
 
-            _context.Categories.Remove(category);
+            _context.Category.Remove(category);
             await _context.SaveChangesAsync();
 
             return NoContent();

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ToDoListApi.Dtos;
 using ToDoListBackend.Data;
+using ToDoListBackend.DTOs;
 using ToDoListBackend.Models;
 
 namespace ToDoListBackend.Controllers
@@ -18,29 +20,80 @@ namespace ToDoListBackend.Controllers
 
         // GET: api/ToDoTasks
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ToDoTask>>> GetTasks()
+        public async Task<ActionResult<IEnumerable<ToDoTaskDto>>> GetTasks()
         {
-            return await _context.ToDoTasks
-                .Include(t => t.Category)
-                .ToListAsync();
+            try
+            {
+                var tasks = await _context.ToDoTasks
+                    .Include(t => t.Category)
+                    .Include(t => t.Project)
+                    .Select(t => new ToDoTaskDto
+                    {
+                        Id = t.Id,
+                        Title = t.Title,
+                        Description = t.Description,
+                        IsCompleted = t.IsCompleted,
+                        DueDate = t.DueDate,
+                        CategoryId = t.CategoryId,
+                        CategoryName = t.Category != null ? t.Category.Name : null,
+                        ProjectId = t.ProjectId,
+                        ProjectName = t.Project != null ? t.Project.Name : null
+                    })
+                    .ToListAsync();
+
+                return Ok(tasks);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error interno: {ex.Message}\n{ex.InnerException?.Message}");
+            }
         }
 
         // POST: api/ToDoTasks
         [HttpPost]
-        public async Task<ActionResult<ToDoTask>> PostToDoTask(ToDoTask toDoTask)
+        public async Task<ActionResult<ToDoTask>> PostToDoTask(ToDoTaskCreateDto toDoTaskDto)
         {
-            toDoTask.Id = 0;
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            if (!_context.Categories.Any(c => c.Id == toDoTask.CategoryId))
+            var toDoTask = new ToDoTask
+            {
+                Id = 0,
+                Title = toDoTaskDto.Title,
+                Description = toDoTaskDto.Description,
+                IsCompleted = toDoTaskDto.IsCompleted,
+                DueDate = toDoTaskDto.DueDate,
+                CategoryId = toDoTaskDto.CategoryId,
+                ProjectId = toDoTaskDto.ProjectId
+            };
+
+            if (!_context.Category.Any(c => c.Id == toDoTask.CategoryId))
             {
                 return BadRequest("La categoría especificada no existe.");
+            }
+            if (!_context.Projects.Any(p => p.Id == toDoTask.ProjectId))
+            {
+                return BadRequest("El proyecto especificado no existe.");
             }
 
             _context.ToDoTasks.Add(toDoTask);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetTasks), new { id = toDoTask.Id }, toDoTask);
+            var createdTask = await _context.ToDoTasks
+                .Include(t => t.Category)
+                .Include(t => t.Project)
+                .FirstOrDefaultAsync(t => t.Id == toDoTask.Id);
+
+            if (createdTask == null)
+            {
+                return NotFound();
+            }
+
+            return CreatedAtAction(nameof(GetTasks), new { id = createdTask.Id }, createdTask);
         }
+
 
         // PUT: api/ToDoTasks
         [HttpPut("{id}")]
@@ -52,7 +105,7 @@ namespace ToDoListBackend.Controllers
                 return NotFound();
             }
 
-            if (!_context.Categories.Any(c => c.Id == updatedTask.CategoryId))
+            if (!_context.Category.Any(c => c.Id == updatedTask.CategoryId))
             {
                 return BadRequest("La categoría especificada no existe.");
             }

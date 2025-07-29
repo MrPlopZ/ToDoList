@@ -1,0 +1,13 @@
+﻿namespace ToDoListApi.Dtos
+{
+    public class ToDoTaskCreateDto
+    {
+        public int Id { get; set; }
+        public required string Title { get; set; }
+        public string? Description { get; set; }
+        public bool IsCompleted { get; set; }
+        public DateTime? DueDate { get; set; }
+        public int CategoryId { get; set; }
+        public int ProjectId { get; set; }
+    }
+}

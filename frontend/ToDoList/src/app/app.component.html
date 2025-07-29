@@ -1,6 +1,6 @@
 <h1>Lista de Tareas</h1>
 
-<form (submit)="addTask()" #taskForm="ngForm">
+<form (ngSubmit)="addTask()" #taskForm="ngForm">
   <input
     type="text"
     name="title"
@@ -21,7 +21,6 @@
     name="dueDate"
     [(ngModel)]="newTask.dueDate"
     placeholder="Fecha límite"
-    required
   />
 
   <label>
@@ -33,13 +32,21 @@
     ¿Completada?
   </label>
 
-  <select [(ngModel)]="newTask.categoryId" name="category">
-    <option *ngFor="let category of categories" [value]="category.id">
+  <!-- Selector de categoría -->
+  <select [(ngModel)]="newTask.categoryId" name="category" required>
+    <option *ngFor="let category of categories" [ngValue]="category.id">
       {{ category.name }}
     </option>
   </select>
 
-  <button type="submit">Añadir</button>
+  <!-- Selector de proyecto -->
+  <select [(ngModel)]="newTask.projectId" name="project" required>
+    <option *ngFor="let project of projects" [ngValue]="project.id">
+      {{ project.name }}
+    </option>
+  </select>
+
+  <button type="submit" [disabled]="taskForm.invalid">Añadir</button>
 </form>
 
 <hr />
@@ -48,10 +55,11 @@
 
 <ul>
   <li *ngFor="let task of tasks">
-    <strong>{{ task.title }}</strong> ({{
-      task.category?.name || "Sin categoría"
-    }})
-    <p>{{ task.description }}</p>
-    <p>Completado: {{ task.isCompleted ? "Sí" : "No" }}</p>
+    <strong>{{ task.title }}</strong>
+    (<span>{{ task.categoryName || 'Sin categoría' }}</span>
+    <span>{{ task.projectName || ' - Sin proyecto' }}</span>)
+    <p>{{ task.description || 'Sin descripción' }}</p>
+    <p>Completado: {{ task.isCompleted ? 'Sí' : 'No' }}</p>
+    <button (click)="deleteTask(task.id)">Eliminar</button>
   </li>
 </ul>
