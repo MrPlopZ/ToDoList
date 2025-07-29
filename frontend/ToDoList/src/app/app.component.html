@@ -1,11 +1,11 @@
-<h1>Lista de Tareas</h1>
+<h1>Task List</h1>
 
 <form (ngSubmit)="addTask()" #taskForm="ngForm">
   <input
     type="text"
     name="title"
     [(ngModel)]="newTask.title"
-    placeholder="Título"
+    placeholder="Title"
     required
   />
 
@@ -13,14 +13,14 @@
     type="text"
     name="description"
     [(ngModel)]="newTask.description"
-    placeholder="Descripción"
+    placeholder="Description"
   />
 
   <input
     type="date"
     name="dueDate"
     [(ngModel)]="newTask.dueDate"
-    placeholder="Fecha límite"
+    placeholder="Due Date"
   />
 
   <label>
@@ -29,24 +29,24 @@
       name="isCompleted"
       [(ngModel)]="newTask.isCompleted"
     />
-    ¿Completada?
+    Completed?
   </label>
 
-  <!-- Selector de categoría -->
+  <!-- Category selector -->
   <select [(ngModel)]="newTask.categoryId" name="category" required>
     <option *ngFor="let category of categories" [ngValue]="category.id">
       {{ category.name }}
     </option>
   </select>
 
-  <!-- Selector de proyecto -->
+  <!-- Project selector -->
   <select [(ngModel)]="newTask.projectId" name="project" required>
     <option *ngFor="let project of projects" [ngValue]="project.id">
       {{ project.name }}
     </option>
   </select>
 
-  <button type="submit" [disabled]="taskForm.invalid">Añadir</button>
+  <button type="submit" [disabled]="taskForm.invalid">Add</button>
 </form>
 
 <hr />
@@ -56,10 +56,10 @@
 <ul>
   <li *ngFor="let task of tasks">
     <strong>{{ task.title }}</strong>
-    (<span>{{ task.categoryName || 'Sin categoría' }}</span>
-    <span>{{ task.projectName || ' - Sin proyecto' }}</span>)
-    <p>{{ task.description || 'Sin descripción' }}</p>
-    <p>Completado: {{ task.isCompleted ? 'Sí' : 'No' }}</p>
-    <button (click)="deleteTask(task.id)">Eliminar</button>
+    (<span>{{ task.categoryName || 'No category' }}</span>
+    <span>{{ task.projectName || ' - No project' }}</span>)
+    <p>{{ task.description || 'No description' }}</p>
+    <p>Completed: {{ task.isCompleted ? 'Yes' : 'No' }}</p>
+    <button (click)="deleteTask(task.id)">Delete</button>
   </li>
 </ul>

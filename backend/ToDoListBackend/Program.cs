@@ -3,7 +3,7 @@ using ToDoListBackend.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configurar DbContext para MySQL (Pomelo)
+// Config DbContext for MySQL (Pomelo)
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseMySql(
         builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -11,7 +11,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     )
 );
 
-// Añadir CORS antes de Build
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAngularDevClient",
@@ -20,16 +20,13 @@ builder.Services.AddCors(options =>
                         .AllowAnyMethod());
 });
 
-// Registrar controladores
-builder.Services.AddControllers();
 
-// Agregar Swagger/OpenAPI
+builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Middleware pipeline
 app.UseRouting();
 
 app.UseCors("AllowAngularDevClient");
@@ -38,7 +35,6 @@ app.UseHttpsRedirection();
 
 if (app.Environment.IsDevelopment())
 {
-    // Habilitar middleware para Swagger
     app.UseSwagger();
     app.UseSwaggerUI();
 }

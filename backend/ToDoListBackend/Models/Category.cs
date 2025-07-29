@@ -9,7 +9,7 @@ namespace ToDoListBackend.Models
         public int Id { get; set; }
         public required string Name { get; set; }
 
-        [JsonIgnore]  // Ignorar en la serialización JSON para evitar ciclos
+        [JsonIgnore]
         public ICollection<ToDoTask> Tasks { get; set; } = new List<ToDoTask>();
     }
 }

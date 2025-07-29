@@ -22,31 +22,24 @@ namespace ToDoListBackend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ToDoTaskDto>>> GetTasks()
         {
-            try
-            {
-                var tasks = await _context.ToDoTasks
-                    .Include(t => t.Category)
-                    .Include(t => t.Project)
-                    .Select(t => new ToDoTaskDto
-                    {
-                        Id = t.Id,
-                        Title = t.Title,
-                        Description = t.Description,
-                        IsCompleted = t.IsCompleted,
-                        DueDate = t.DueDate,
-                        CategoryId = t.CategoryId,
-                        CategoryName = t.Category != null ? t.Category.Name : null,
-                        ProjectId = t.ProjectId,
-                        ProjectName = t.Project != null ? t.Project.Name : null
-                    })
-                    .ToListAsync();
+            var tasks = await _context.ToDoTasks
+                .Include(t => t.Category)
+                .Include(t => t.Project)
+                .Select(t => new ToDoTaskDto
+                {
+                    Id = t.Id,
+                    Title = t.Title,
+                    Description = t.Description,
+                    IsCompleted = t.IsCompleted,
+                    DueDate = t.DueDate,
+                    CategoryId = t.CategoryId,
+                    CategoryName = t.Category != null ? t.Category.Name : null,
+                    ProjectId = t.ProjectId,
+                    ProjectName = t.Project != null ? t.Project.Name : null
+                })
+                .ToListAsync();
 
-                return Ok(tasks);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Error interno: {ex.Message}\n{ex.InnerException?.Message}");
-            }
+            return Ok(tasks);
         }
 
         // POST: api/ToDoTasks
@@ -54,13 +47,16 @@ namespace ToDoListBackend.Controllers
         public async Task<ActionResult<ToDoTask>> PostToDoTask(ToDoTaskCreateDto toDoTaskDto)
         {
             if (!ModelState.IsValid)
-            {
                 return BadRequest(ModelState);
-            }
+
+            if (!_context.Category.Any(c => c.Id == toDoTaskDto.CategoryId))
+                return BadRequest("La categoría especificada no existe.");
+
+            if (!_context.Projects.Any(p => p.Id == toDoTaskDto.ProjectId))
+                return BadRequest("El proyecto especificado no existe.");
 
             var toDoTask = new ToDoTask
             {
-                Id = 0,
                 Title = toDoTaskDto.Title,
                 Description = toDoTaskDto.Description,
                 IsCompleted = toDoTaskDto.IsCompleted,
@@ -68,15 +64,6 @@ namespace ToDoListBackend.Controllers
                 CategoryId = toDoTaskDto.CategoryId,
                 ProjectId = toDoTaskDto.ProjectId
             };
-
-            if (!_context.Category.Any(c => c.Id == toDoTask.CategoryId))
-            {
-                return BadRequest("La categoría especificada no existe.");
-            }
-            if (!_context.Projects.Any(p => p.Id == toDoTask.ProjectId))
-            {
-                return BadRequest("El proyecto especificado no existe.");
-            }
 
             _context.ToDoTasks.Add(toDoTask);
             await _context.SaveChangesAsync();
@@ -86,14 +73,8 @@ namespace ToDoListBackend.Controllers
                 .Include(t => t.Project)
                 .FirstOrDefaultAsync(t => t.Id == toDoTask.Id);
 
-            if (createdTask == null)
-            {
-                return NotFound();
-            }
-
-            return CreatedAtAction(nameof(GetTasks), new { id = createdTask.Id }, createdTask);
+            return CreatedAtAction(nameof(GetTasks), new { id = createdTask!.Id }, createdTask);
         }
-
 
         // PUT: api/ToDoTasks
         [HttpPut("{id}")]
@@ -101,14 +82,10 @@ namespace ToDoListBackend.Controllers
         {
             var existingTask = await _context.ToDoTasks.FindAsync(id);
             if (existingTask == null)
-            {
                 return NotFound();
-            }
 
             if (!_context.Category.Any(c => c.Id == updatedTask.CategoryId))
-            {
                 return BadRequest("La categoría especificada no existe.");
-            }
 
             existingTask.Title = updatedTask.Title;
             existingTask.Description = updatedTask.Description;
@@ -117,7 +94,6 @@ namespace ToDoListBackend.Controllers
             existingTask.CategoryId = updatedTask.CategoryId;
 
             await _context.SaveChangesAsync();
-
             return NoContent();
         }
 
@@ -127,9 +103,7 @@ namespace ToDoListBackend.Controllers
         {
             var toDoTask = await _context.ToDoTasks.FindAsync(id);
             if (toDoTask == null)
-            {
                 return NotFound();
-            }
 
             _context.ToDoTasks.Remove(toDoTask);
             await _context.SaveChangesAsync();
