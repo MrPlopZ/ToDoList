@@ -15,6 +15,8 @@ import { Project } from './Models/project.model';
 })
 export class AppComponent implements OnInit {
   title = 'ToDoList';
+  showModal: boolean = false;
+  viewingCompleted: boolean = false;
   tasks: ToDoTask[] = [];
   categories: Category[] = [];
   projects: Project[] = [];
@@ -69,23 +71,27 @@ export class AppComponent implements OnInit {
   }
 
   selectProject(projectId: number): void {
+    this.viewingCompleted = false;
     this.selectedProjectId = projectId;
     this.newTask.projectId = projectId;
     this.updateFilteredTasks();
   }
 
   getProjectName(projectId: number): string {
-    const project = this.projects.find(p => p.id === projectId);
+    const project = this.projects.find((p) => p.id === projectId);
     return project ? project.name : 'Sin proyecto';
   }
 
   updateFilteredTasks(): void {
-    if (this.selectedProjectId === null) {
-      this.filteredTasks = this.tasks;
-    } else {
-      this.filteredTasks = this.tasks.filter(task => task.projectId === this.selectedProjectId);
-    }
+  if (this.selectedProjectId === null) {
+    this.filteredTasks = this.tasks.filter(task => !task.isCompleted);
+  } else {
+    this.filteredTasks = this.tasks.filter(
+      task => task.projectId === this.selectedProjectId && !task.isCompleted
+    );
   }
+}
+
 
   addTask(): void {
     console.log('Formulario enviado:', this.newTask);
@@ -102,13 +108,18 @@ export class AppComponent implements OnInit {
     const categoryId = Number(this.newTask.categoryId);
     const projectId = Number(this.newTask.projectId);
 
-    const categoryExists = this.categories.some(c => c.id === categoryId);
-    const projectExists = this.projects.some(p => p.id === projectId);
+    const categoryExists = this.categories.some((c) => c.id === categoryId);
+    const projectExists = this.projects.some((p) => p.id === projectId);
     if (!categoryExists || !projectExists) {
       console.error('Categoría o proyecto no válidos');
       console.log('Categorías disponibles:', this.categories);
       console.log('Proyectos disponibles:', this.projects);
-      console.log('categoryId enviado:', categoryId, 'projectId enviado:', projectId);
+      console.log(
+        'categoryId enviado:',
+        categoryId,
+        'projectId enviado:',
+        projectId
+      );
       return;
     }
 
@@ -148,8 +159,11 @@ export class AppComponent implements OnInit {
           description: '',
           dueDate: undefined,
           isCompleted: false,
-          categoryId: this.categories.length > 0 ? this.categories[0].id : undefined,
-          projectId: this.selectedProjectId || (this.projects.length > 0 ? this.projects[0].id : undefined),
+          categoryId:
+            this.categories.length > 0 ? this.categories[0].id : undefined,
+          projectId:
+            this.selectedProjectId ||
+            (this.projects.length > 0 ? this.projects[0].id : undefined),
         };
       },
       error: (err) => {
@@ -162,7 +176,7 @@ export class AppComponent implements OnInit {
   deleteTask(taskId: number): void {
     this.todoService.deleteTask(taskId).subscribe({
       next: () => {
-        this.tasks = this.tasks.filter(task => task.id !== taskId);
+        this.tasks = this.tasks.filter((task) => task.id !== taskId);
         this.updateFilteredTasks();
         console.log(`Tarea con ID ${taskId} eliminada`);
       },
@@ -173,8 +187,14 @@ export class AppComponent implements OnInit {
     });
   }
 
+  viewCompletedTasks(): void {
+    this.viewingCompleted = true;
+    this.selectedProjectId = null;
+    this.filteredTasks = this.tasks.filter((task) => task.isCompleted);
+  }
+
   completeTask(taskId: number): void {
-    const task = this.tasks.find(t => t.id === taskId);
+    const task = this.tasks.find((t) => t.id === taskId);
     if (!task) {
       console.error('Tarea no encontrada:', taskId);
       return;
@@ -182,7 +202,7 @@ export class AppComponent implements OnInit {
 
     const updatedTask: ToDoTask = {
       ...task,
-      isCompleted: true
+      isCompleted: true,
     };
 
     this.todoService.updateTask(updatedTask).subscribe({

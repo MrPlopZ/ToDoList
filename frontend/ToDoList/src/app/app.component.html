@@ -7,6 +7,10 @@
   <div class="main-wrapper">
     <!-- Sidebar -->
     <nav class="sidebar">
+      <button class="add-task-button" (click)="showModal = true">+ Añadir tarea</button>
+      <button class="sidebar-button" [class.active]="viewingCompleted" (click)="viewCompletedTasks()">
+        Completadas
+      </button>
       <h2 class="sidebar-title">Proyectos</h2>
       <ul class="sidebar-list">
         <li *ngFor="let project of projects" class="sidebar-item">
@@ -21,44 +25,9 @@
     <!-- Main Content -->
     <main class="main-content">
       <h2 class="section-title">
-        Tareas
-        {{ selectedProjectId ? "de " + getProjectName(selectedProjectId) : "" }}
+        {{ viewingCompleted ? 'Tareas completadas' : (selectedProjectId ? 'Tareas de ' +
+        getProjectName(selectedProjectId) : 'Todas las tareas') }}
       </h2>
-
-      <!-- Formulario -->
-      <form (ngSubmit)="addTask()" #taskForm="ngForm" class="task-form">
-        <div class="form-grid">
-          <input type="text" name="title" [(ngModel)]="newTask.title" placeholder="Título" required
-            class="form-input" />
-
-          <textarea name="description" [(ngModel)]="newTask.description" placeholder="Descripción" class="form-input"
-            rows="3"></textarea>
-
-
-          <input type="date" name="dueDate" [(ngModel)]="newTask.dueDate" placeholder="Fecha límite"
-            class="form-input" />
-
-          <!-- Selector de categoría -->
-          <select [(ngModel)]="newTask.categoryId" name="category" required class="form-input">
-            <option value="" disabled selected>Selecciona una categoría</option>
-            <option *ngFor="let category of categories" [ngValue]="category.id">
-              {{ category.name }}
-            </option>
-          </select>
-
-          <!-- Selector de proyecto -->
-          <select [(ngModel)]="newTask.projectId" name="project" required class="form-input">
-            <option value="" disabled selected>Selecciona un proyecto</option>
-            <option *ngFor="let project of projects" [ngValue]="project.id">
-              {{ project.name }}
-            </option>
-          </select>
-
-          <button type="submit" [disabled]="taskForm.invalid" class="form-button">
-            Añadir
-          </button>
-        </div>
-      </form>
 
       <!-- Lista de tareas -->
       <ul class="task-list">
@@ -80,4 +49,81 @@
       </ul>
     </main>
   </div>
+  <!-- Modal para añadir tarea -->
+  <!-- Modal para añadir tarea -->
+<div class="modal-backdrop" *ngIf="showModal">
+  <div class="modal new-task-modal">
+    <form (ngSubmit)="addTask(); showModal = false" #taskForm="ngForm">
+      <input
+        type="text"
+        name="title"
+        [(ngModel)]="newTask.title"
+        class="modal-input-title"
+        placeholder="Escribe el título de la tarea"
+        required
+      />
+
+      <textarea
+        name="description"
+        [(ngModel)]="newTask.description"
+        placeholder="Descripción"
+        class="modal-textarea"
+        rows="2"
+      ></textarea>
+
+      <div class="modal-options">
+        <input
+          type="date"
+          [(ngModel)]="newTask.dueDate"
+          name="dueDate"
+          class="form-input"
+          style="border: none; background: transparent"
+        />
+      </div>
+
+      <div class="modal-footer">
+        <select
+          [(ngModel)]="newTask.projectId"
+          name="project"
+          required
+          class="modal-project-select"
+        >
+          <option value="" disabled selected>Selecciona un proyecto</option>
+          <option
+            *ngFor="let project of projects"
+            [ngValue]="project.id"
+          >
+            {{ project.name }}
+          </option>
+        </select>
+
+        <select
+          [(ngModel)]="newTask.categoryId"
+          name="category"
+          required
+          class="modal-project-select"
+        >
+          <option value="" disabled selected>Selecciona una categoría</option>
+          <option
+            *ngFor="let category of categories"
+            [ngValue]="category.id"
+          >
+            {{ category.name }}
+          </option>
+        </select>
+
+        <div class="modal-buttons">
+          <button type="button" class="cancel-button" (click)="showModal = false">
+            Cancelar
+          </button>
+          <button type="submit" [disabled]="taskForm.invalid" class="form-button">
+            Añadir tarea
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+
 </div>
