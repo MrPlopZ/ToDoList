@@ -1,65 +1,83 @@
-<h1>Task List</h1>
+<div class="container">
+  <!-- Header -->
+  <header class="header">
+    <h1 class="header-title">{{ title }}</h1>
+  </header>
 
-<form (ngSubmit)="addTask()" #taskForm="ngForm">
-  <input
-    type="text"
-    name="title"
-    [(ngModel)]="newTask.title"
-    placeholder="Title"
-    required
-  />
+  <div class="main-wrapper">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <h2 class="sidebar-title">Proyectos</h2>
+      <ul class="sidebar-list">
+        <li *ngFor="let project of projects" class="sidebar-item">
+          <button class="sidebar-button" [class.active]="selectedProjectId === project.id"
+            (click)="selectProject(project.id)">
+            {{ project.name }}
+          </button>
+        </li>
+      </ul>
+    </nav>
 
-  <input
-    type="text"
-    name="description"
-    [(ngModel)]="newTask.description"
-    placeholder="Description"
-  />
+    <!-- Main Content -->
+    <main class="main-content">
+      <h2 class="section-title">
+        Tareas
+        {{ selectedProjectId ? "de " + getProjectName(selectedProjectId) : "" }}
+      </h2>
 
-  <input
-    type="date"
-    name="dueDate"
-    [(ngModel)]="newTask.dueDate"
-    placeholder="Due Date"
-  />
+      <!-- Formulario -->
+      <form (ngSubmit)="addTask()" #taskForm="ngForm" class="task-form">
+        <div class="form-grid">
+          <input type="text" name="title" [(ngModel)]="newTask.title" placeholder="Título" required
+            class="form-input" />
 
-  <label>
-    <input
-      type="checkbox"
-      name="isCompleted"
-      [(ngModel)]="newTask.isCompleted"
-    />
-    Completed?
-  </label>
+          <textarea name="description" [(ngModel)]="newTask.description" placeholder="Descripción" class="form-input"
+            rows="3"></textarea>
 
-  <!-- Category selector -->
-  <select [(ngModel)]="newTask.categoryId" name="category" required>
-    <option *ngFor="let category of categories" [ngValue]="category.id">
-      {{ category.name }}
-    </option>
-  </select>
 
-  <!-- Project selector -->
-  <select [(ngModel)]="newTask.projectId" name="project" required>
-    <option *ngFor="let project of projects" [ngValue]="project.id">
-      {{ project.name }}
-    </option>
-  </select>
+          <input type="date" name="dueDate" [(ngModel)]="newTask.dueDate" placeholder="Fecha límite"
+            class="form-input" />
 
-  <button type="submit" [disabled]="taskForm.invalid">Add</button>
-</form>
+          <!-- Selector de categoría -->
+          <select [(ngModel)]="newTask.categoryId" name="category" required class="form-input">
+            <option value="" disabled selected>Selecciona una categoría</option>
+            <option *ngFor="let category of categories" [ngValue]="category.id">
+              {{ category.name }}
+            </option>
+          </select>
 
-<hr />
+          <!-- Selector de proyecto -->
+          <select [(ngModel)]="newTask.projectId" name="project" required class="form-input">
+            <option value="" disabled selected>Selecciona un proyecto</option>
+            <option *ngFor="let project of projects" [ngValue]="project.id">
+              {{ project.name }}
+            </option>
+          </select>
 
-<h1>{{ title }}</h1>
+          <button type="submit" [disabled]="taskForm.invalid" class="form-button">
+            Añadir
+          </button>
+        </div>
+      </form>
 
-<ul>
-  <li *ngFor="let task of tasks">
-    <strong>{{ task.title }}</strong>
-    (<span>{{ task.categoryName || 'No category' }}</span>
-    <span>{{ task.projectName || ' - No project' }}</span>)
-    <p>{{ task.description || 'No description' }}</p>
-    <p>Completed: {{ task.isCompleted ? 'Yes' : 'No' }}</p>
-    <button (click)="deleteTask(task.id)">Delete</button>
-  </li>
-</ul>
+      <!-- Lista de tareas -->
+      <ul class="task-list">
+        <li *ngFor="let task of filteredTasks" class="task-item">
+          <strong class="task-title">{{ task.title }}</strong>
+          <div class="task-meta">
+            <span class="task-category">#{{ task.categoryName || "Sin categoría" }}</span>
+          </div>
+          <p>{{ task.description || "Sin descripción" }}</p>
+          <div class="task-actions">
+            <button *ngIf="!task.isCompleted" (click)="completeTask(task.id)" class="complete-button">
+              Finalizar
+            </button>
+            <button (click)="deleteTask(task.id)" class="delete-button">
+              Eliminar
+            </button>
+          </div>
+        </li>
+      </ul>
+    </main>
+  </div>
+</div>

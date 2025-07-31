@@ -25,6 +25,10 @@ export class TodoService {
     return this.http.delete<void>(`${this.baseApiUrl}/ToDoTasks/${taskId}`);
   }
 
+  updateTask(task: ToDoTask): Observable<ToDoTask> {
+    return this.http.put<ToDoTask>(`${this.baseApiUrl}/ToDoTasks/${task.id}`, task);
+  }
+
   getCategories(): Observable<Category[]> {
     return this.http.get<Category[]>(`${this.baseApiUrl}/Categories`);
   }
